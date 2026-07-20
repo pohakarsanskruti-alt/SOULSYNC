@@ -12,6 +12,7 @@ from telegram.ext import (
 load_dotenv()
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
+print("BOT TOKEN FOUND: ", BOT_TOKEN is not None)
 favorites = {}
 playlists = {}
 

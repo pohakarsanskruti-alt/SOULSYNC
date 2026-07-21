@@ -1,6 +1,10 @@
 import os
 import requests
+import asyncio
+from flask import Flask, request
+
 from dotenv import load_dotenv
+
 from telegram import Update
 from telegram.ext import (
     Application,
@@ -197,18 +201,66 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
 
-def main():
-    app = Application.builder().token(BOT_TOKEN).build()
+app = Flask(__name__)
+application = None
 
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("help", help_command))
-    app.add_handler(CommandHandler("play", play))
-    app.add_handler(CommandHandler("favorites", favorites_command))
-    app.add_handler(CallbackQueryHandler(button))
-    app.add_handler(CommandHandler("playlist", playlist_command))
+PORT = int(os.environ.get("PORT", 10000))
+WEBHOOK_URL = os.getenv("WEBHOOK_URL")
+
+
+@app.route("/")
+def home():
+    return "SOULSYNC Bot is running!"
+
+
+@app.route("/webhook", methods=["POST"])
+def webhook():
+
+    update = Update.de_json(
+        request.get_json(force=True),
+        application.bot
+    )
+
+    asyncio.run(
+        application.process_update(update)
+    )
+
+    return "OK", 200
+
+
+async def setup_webhook(application):
+
+    await application.initialize()
+
+    await application.bot.set_webhook(
+        url=f"{WEBHOOK_URL}/webhook"
+    )
+
+    print("Webhook set successfully")
+
+    await application.start()
+
+
+def main():
+    application = Application.builder().token(BOT_TOKEN).build()
+
+    globals()["application"] = application
+
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("play", play))
+    application.add_handler(CommandHandler("favorites", favorites_command))
+    application.add_handler(CallbackQueryHandler(button))
+    application.add_handler(CommandHandler("playlist", playlist_command))
 
     print("🎵 Music Bot is running...")
-    app.run_polling()
+
+    #asyncio.run(setup_webhook(application))
+
+    app.run(
+        host="0.0.0.0",
+        port=PORT
+    )
 
 
 if __name__ == "__main__":

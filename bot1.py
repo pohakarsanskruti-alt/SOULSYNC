@@ -13,8 +13,6 @@ load_dotenv()
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
-if not BOT_TOKEN:
-    raise ValueError("BOT_TOKEN is missing from Railway VAriables")
 print("BOT TOKEN FOUND: ", BOT_TOKEN is not None)
 favorites = {}
 playlists = {}

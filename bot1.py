@@ -229,6 +229,7 @@ def webhook():
 
 
 async def setup_webhook(application):
+    print("WEBHOOK URL IS :", WEBHOOK_URL)
 
     await application.initialize()
 

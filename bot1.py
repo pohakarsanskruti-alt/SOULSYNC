@@ -255,7 +255,7 @@ def main():
 
     print("🎵 Music Bot is running...")
 
-    #asyncio.run(setup_webhook(application))
+    asyncio.run(setup_webhook(application))
 
     app.run(
         host="0.0.0.0",
